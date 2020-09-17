@@ -41,7 +41,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="addConfiguration" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addClientData" max="32767" attributes="0"/>
+              <Component id="addClientData" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -164,25 +164,25 @@
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JTextField" name="txtLdapLogin">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Ldap login"/>
-          </Properties>
+          <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtLdapLoginFocusGained"/>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtLdapLoginFocusLost"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JPasswordField" name="txtPassword">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="111111111"/>
-          </Properties>
           <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPasswordFocusGained"/>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPasswordFocusLost"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPasswordActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="txtOTP">
           <Properties>
-            <Property name="text" type="java.lang.String" value="OTP"/>
             <Property name="toolTipText" type="java.lang.String" value="&#x41f;&#x43e;&#x43b;&#x435; &#x434;&#x43b;&#x44f; &#x432;&#x432;&#x43e;&#x434;&#x430; &#x43e;&#x434;&#x43d;&#x43e;&#x440;&#x430;&#x437;&#x43e;&#x432;&#x43e;&#x433;&#x43e; &#x43f;&#x430;&#x440;&#x43e;&#x43b;&#x44f;"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtOTPActionPerformed"/>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtOTPFocusGained"/>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtOTPFocusLost"/>
           </Events>
         </Component>
         <Component class="javax.swing.JCheckBox" name="chboxSaveData">

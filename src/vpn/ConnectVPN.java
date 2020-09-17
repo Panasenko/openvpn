@@ -1,26 +1,27 @@
 package vpn;
 
-import java.awt.Component;
 import java.io.File;
 import javax.swing.JFileChooser;
-import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 
 public class ConnectVPN extends javax.swing.JFrame {
 
     private static final String CONF_FILE_EXTENSION = "conf";
     private static final String CONF_FILE_DESCRIPTION = "Файлы конфигураций";
-    private static final String CONNECT_DATA_FILE_EXTENSION = "cdata";
-    private static final String CONNECT_DATA_FILE_DESCRIPTION = "Файлы настроек подключения";
+
+    private static final String INPUT_LDAP_NAME = "Введите логин";
+    private static final String INPUT_PASS_NAME = "Пароль";
+    private static final String INPUT_OTP_NAME = "Введите ОТП";
     private static final String EMPTY_STRING = "";
 
     private FileFilter confFilter = new ConfFileFilter(CONF_FILE_EXTENSION, CONF_FILE_DESCRIPTION);
-    private FileFilter connectDataFilter = new ConfFileFilter(CONNECT_DATA_FILE_EXTENSION, CONNECT_DATA_FILE_DESCRIPTION);
 
     private ConnectData connectData = new ConnectData();
 
     public ConnectVPN() {
         initComponents();
+        initPanel();
+        FileChooser.setCurrentDirectory(new File("/etc/openvpn"));
     }
 
     /**
@@ -96,20 +97,36 @@ public class ConnectVPN extends javax.swing.JFrame {
                 .addContainerGap(11, Short.MAX_VALUE))
         );
 
-        txtLdapLogin.setText("Ldap login");
+        txtLdapLogin.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtLdapLoginFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtLdapLoginFocusLost(evt);
+            }
+        });
 
-        txtPassword.setText("111111111");
+        txtPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtPasswordFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPasswordFocusLost(evt);
+            }
+        });
         txtPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPasswordActionPerformed(evt);
             }
         });
 
-        txtOTP.setText("OTP");
         txtOTP.setToolTipText("Поле для ввода одноразового пароля");
-        txtOTP.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtOTPActionPerformed(evt);
+        txtOTP.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtOTPFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtOTPFocusLost(evt);
             }
         });
 
@@ -170,27 +187,25 @@ public class ConnectVPN extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(addConfiguration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(addClientData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(addClientData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void initPanel() {
+        txtOTP.setText(INPUT_OTP_NAME);
+        txtLdapLogin.setText(INPUT_LDAP_NAME);
+        txtPassword.setText(INPUT_PASS_NAME);
+    }
+
     private void txtAddConfigurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAddConfigurationActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtAddConfigurationActionPerformed
 
-    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPasswordActionPerformed
-
     private void chboxSaveDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chboxSaveDataActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chboxSaveDataActionPerformed
-
-    private void txtOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtOTPActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtOTPActionPerformed
 
     private void btnAddConfigurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddConfigurationActionPerformed
         FileUtils.addFileFilter(FileChooser, confFilter);
@@ -201,13 +216,49 @@ public class ConnectVPN extends javax.swing.JFrame {
 
             String path = confFile.getPath();
             connectData.setPathConfFile(path);
-            
-            Component panTextField = addConfiguration.getComponent(0);
-            JTextField panTF = (JTextField) panTextField;
-            panTF.setText(path);
-
+            txtAddConfiguration.setText(path);
         }
     }//GEN-LAST:event_btnAddConfigurationActionPerformed
+
+    private void txtLdapLoginFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtLdapLoginFocusGained
+        if (txtLdapLogin.getText().equals(INPUT_LDAP_NAME)) {
+            txtLdapLogin.setText(EMPTY_STRING);
+        }
+    }//GEN-LAST:event_txtLdapLoginFocusGained
+
+    private void txtLdapLoginFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtLdapLoginFocusLost
+        if (txtLdapLogin.getText().trim().equals(EMPTY_STRING)) {
+            txtLdapLogin.setText(INPUT_LDAP_NAME);
+        }
+    }//GEN-LAST:event_txtLdapLoginFocusLost
+
+    private void txtOTPFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtOTPFocusGained
+        if (txtOTP.getText().equals(INPUT_OTP_NAME)) {
+            txtOTP.setText(EMPTY_STRING);
+        }
+    }//GEN-LAST:event_txtOTPFocusGained
+
+    private void txtOTPFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtOTPFocusLost
+        if (txtOTP.getText().trim().equals(EMPTY_STRING)) {
+            txtOTP.setText(INPUT_OTP_NAME);
+        }
+    }//GEN-LAST:event_txtOTPFocusLost
+
+    private void txtPasswordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusGained
+        if (txtPassword.getText().equals(INPUT_PASS_NAME)) {
+            txtPassword.setText(EMPTY_STRING);
+        }
+    }//GEN-LAST:event_txtPasswordFocusGained
+
+    private void txtPasswordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusLost
+        if (txtPassword.getText().equals(EMPTY_STRING)) {
+            txtPassword.setText(INPUT_PASS_NAME);
+        }
+    }//GEN-LAST:event_txtPasswordFocusLost
+
+    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPasswordActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

@@ -3,11 +3,7 @@ package vpn;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import static java.util.Optional.empty;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 
 public class ConnectVPN {
 
@@ -40,42 +36,36 @@ public class ConnectVPN {
 
     public void connect() {
 
-//        environment.put("GREETING", "Hola Mundo");
-//
-//        processBuilder.command("/bin/bash", "-c", "echo $GREETING");
         tmpFile = FileUtils.genereteTempFile();
-
+        System.out.println(tmpFile);
         if (FileUtils.fileWriter(tmpFile, (dataConnect.getLogin() + "\n" + dataConnect.getPassword()))) {
 
-//            String[] cmd = new String[]{"/bin/bash", "-c", "openvpn "
-//                + "--auth-user-pass " + "/etc/openvpn/client/login.txt"
-//                + "--config " + dataConnect.getPathConfFile()};
-//            String[] cmd = new String[]{"java", "-version"};
+            String[] cmd = new String[]{"/bin/bash", "-c", "openvpn --auth-user-pass " + tmpFile + " --config " + dataConnect.getPathConfFile() + " &"};
             try {
-                ProcessBuilder processBuilder = new ProcessBuilder("java", "-version");
+                ProcessBuilder processBuilder = new ProcessBuilder();
+
+                Map<String, String> environment = processBuilder.environment();
+                processBuilder.command(cmd);
 
                 Process process = processBuilder.start();
 
-//                List<String> results = readOutput(process.getInputStream());
-
-                int exitCode = process.waitFor();
-                System.out.println(exitCode);
-
+                if (process.exitValue() == 0) {
+                    this.setStatusConnect(true);
+                } else {
+                    this.setStatusConnect(false);
+                }
+                
             } catch (IOException ex) {
                 System.out.println("Выпало в кетч " + ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ConnectVPN.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            } 
 
         } else {
             System.out.println("Ошибка, данные в временный файл не записаны ");
         }
-
     }
 
     public void disconnect() {
-
+        this.process.destroy();
     }
-
 
 }

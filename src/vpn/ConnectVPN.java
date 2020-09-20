@@ -3,12 +3,11 @@ package vpn;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
+import java.util.List;
+import static java.util.Optional.empty;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
 
 public class ConnectVPN {
 
@@ -39,38 +38,35 @@ public class ConnectVPN {
         this.dataConnect = dataConnect;
     }
 
-    public void connect(String OTP) {
+    public void connect() {
 
+//        environment.put("GREETING", "Hola Mundo");
+//
+//        processBuilder.command("/bin/bash", "-c", "echo $GREETING");
         tmpFile = FileUtils.genereteTempFile();
-        System.out.println(tmpFile);
-        
-        if (FileUtils.fileWriter(tmpFile, this.genereteConnectString(this.getDataConnect(), OTP))) {
 
-            String[] cmd = new String[]{"/bin/bash", "-c", "/usr/bin/sudo -S openvpn "
-                + "--auth-user-pass " + tmpFile
-                + "--config " + dataConnect.getPathConfFile()
-                + " 2>&1"};
+        if (FileUtils.fileWriter(tmpFile, (dataConnect.getLogin() + "\n" + dataConnect.getPassword()))) {
 
+//            String[] cmd = new String[]{"/bin/bash", "-c", "openvpn "
+//                + "--auth-user-pass " + "/etc/openvpn/client/login.txt"
+//                + "--config " + dataConnect.getPathConfFile()};
+//            String[] cmd = new String[]{"java", "-version"};
             try {
-                process = new ProcessBuilder(cmd).start();
-                if (inputStream(process)) {
+                ProcessBuilder processBuilder = new ProcessBuilder("java", "-version");
 
-                    this.setStatusConnect(true);
-                } else {
-                    this.setStatusConnect(false);
-                }
+                Process process = processBuilder.start();
+
+//                List<String> results = readOutput(process.getInputStream());
+
+                int exitCode = process.waitFor();
+                System.out.println(exitCode);
 
             } catch (IOException ex) {
+                System.out.println("Выпало в кетч " + ex);
+            } catch (InterruptedException ex) {
                 Logger.getLogger(ConnectVPN.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-//            finally {
-//                if (FileUtils.deleteTempFile(tmpFile)) {
-//                    System.out.println("Временный файл удален");
-//                } else {
-//                    System.out.println("Ошибка удаления файла");
-//                }
-//            }
         } else {
             System.out.println("Ошибка, данные в временный файл не записаны ");
         }
@@ -81,82 +77,5 @@ public class ConnectVPN {
 
     }
 
-    private boolean inputStream(Process process) {
 
-        System.out.println("input");
-
-        InputStreamReader input = new InputStreamReader(process.getInputStream());
-
-        try {
-
-            int bytes = 0;
-            char buffer[] = new char[1024];
-
-            boolean check = false;
-
-            do {
-                String data = String.valueOf(buffer, 0, input.read(buffer, 0, 1024));
-
-                if (data.contains("[sudo] пароль")) {
-                    if (!outputStream(data)) {
-                        check = true;
-                    } else {
-                        check = false;
-                    }
-                }
-//                System.out.println("Проверка после подключения буфера" + String.valueOf(buffer, 0, input.read(buffer, 0, 1024)));
-            } while (check);
-
-            return true;
-        } catch (IOException ex) {
-            System.out.println(ex);
-        } 
-        
-//        finally {
-//            try {
-//                input.close();
-//            } catch (IOException ex) {
-//                Logger.getLogger(ConnectVPN.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        }
-
-        return false;
-    }
-
-    private boolean outputStream(String data) {
-        OutputStreamWriter output = new OutputStreamWriter(process.getOutputStream());
-
-        try {
-            char password[] = this.getPasswordDialog();
-            output.write(password);
-            output.write('\n');
-            output.flush();
-            output.close();
-
-            System.out.println("Пройдено");
-            return true;
-        } catch (IOException ex) {
-            Logger.getLogger(ConnectVPN.class.getName()).log(Level.SEVERE, null, ex);
-
-        }
-
-        return false;
-
-    }
-
-    public char[] getPasswordDialog() {
-        JPasswordField pf = new JPasswordField();
-        int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        char[] cp = null;
-        if (okCxl == JOptionPane.OK_OPTION) {
-            cp = pf.getPassword();
-            System.out.println(cp);
-        }
-        return cp;
-    }
-
-    private String genereteConnectString(DataConnect dc, String OTP) {
-        return dc.getLogin() + "\n" + dc.getPassword() + OTP;
-    }
 }

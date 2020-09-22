@@ -3,15 +3,16 @@ package vpn;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class ConnectVPN {
+public class ConnectVPN extends Thread{
 
     private DataConnect dataConnect;
     private Component comp;
     private Process process;
-    private boolean statusConnect = false;
     private File tmpFile;
+    private boolean statusConnect = false;
 
     public ConnectVPN(Component comp, DataConnect dc) {
         this.comp = comp;
@@ -34,38 +35,33 @@ public class ConnectVPN {
         this.dataConnect = dataConnect;
     }
 
-    public void connect() {
-
-        tmpFile = FileUtils.genereteTempFile();
-        System.out.println(tmpFile);
+    
+    @Override
+    public void run(){
+         tmpFile = FileUtils.genereteTempFile();
         if (FileUtils.fileWriter(tmpFile, (dataConnect.getLogin() + "\n" + dataConnect.getPassword()))) {
 
-            String[] cmd = new String[]{"/bin/bash", "-c", "openvpn --auth-user-pass " + tmpFile + " --config " + dataConnect.getPathConfFile() + " &"};
+            String[] cmd = new String[]{"/bin/bash", "-c", "openvpn --auth-user-pass " + tmpFile + " --config " + dataConnect.getPathConfFile()};
+            
             try {
-                ProcessBuilder processBuilder = new ProcessBuilder();
-
-                Map<String, String> environment = processBuilder.environment();
-                processBuilder.command(cmd);
-
-                Process process = processBuilder.start();
-
-                if (process.exitValue() == 0) {
-                    this.setStatusConnect(true);
-                } else {
-                    this.setStatusConnect(false);
-                }
+                ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+                process = processBuilder.start();
                 
+                FileUtils.deleteTempFile(tmpFile);
+                this.setStatusConnect(true);
+                process.waitFor();
+                this.setStatusConnect(false);
             } catch (IOException ex) {
-                System.out.println("Выпало в кетч " + ex);
-            } 
+                System.out.println("Error in method connect " + ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ConnectVPN.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
-        } else {
-            System.out.println("Ошибка, данные в временный файл не записаны ");
-        }
+        } 
     }
 
-    public void disconnect() {
+    public boolean disconnect() {
         this.process.destroy();
+        return statusConnect = false;
     }
-
 }

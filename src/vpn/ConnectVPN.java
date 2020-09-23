@@ -6,17 +6,19 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ConnectVPN extends Thread{
+public class ConnectVPN extends Thread {
 
     private DataConnect dataConnect;
     private Component comp;
+    private String otp;
     private Process process;
     private File tmpFile;
     private boolean statusConnect = false;
 
-    public ConnectVPN(Component comp, DataConnect dc) {
+    public ConnectVPN(Component comp, DataConnect dc, String otp) {
         this.comp = comp;
         this.dataConnect = dc;
+        this.otp = otp;
     }
 
     public boolean getStatusConnect() {
@@ -35,18 +37,19 @@ public class ConnectVPN extends Thread{
         this.dataConnect = dataConnect;
     }
 
-    
     @Override
-    public void run(){
-         tmpFile = FileUtils.genereteTempFile();
-        if (FileUtils.fileWriter(tmpFile, (dataConnect.getLogin() + "\n" + dataConnect.getPassword()))) {
+    public void run() {
+        
+        tmpFile = FileUtils.genereteTempFile();
+        
+        if (FileUtils.fileWriter(tmpFile, (dataConnect.getLogin() + "\n" + dataConnect.getPassword() + otp))) {
 
             String[] cmd = new String[]{"/bin/bash", "-c", "openvpn --auth-user-pass " + tmpFile + " --config " + dataConnect.getPathConfFile()};
-            
+
             try {
                 ProcessBuilder processBuilder = new ProcessBuilder(cmd);
                 process = processBuilder.start();
-                
+
                 FileUtils.deleteTempFile(tmpFile);
                 this.setStatusConnect(true);
                 process.waitFor();
@@ -57,7 +60,7 @@ public class ConnectVPN extends Thread{
                 Logger.getLogger(ConnectVPN.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } 
+        }
     }
 
     public boolean disconnect() {

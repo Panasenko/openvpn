@@ -24,24 +24,24 @@ public class FileUtils {
     }
 
     public static File genereteTempFile() {
-        File file = null;
-
-        try {
-            String path = new File("").getCanonicalPath();
-
-            System.out.println("Путь " + path);
-            file = new File(path + FILE_NAME);
-            file.setWritable(true);
-            file.setReadable(true);
-        } catch (IOException ex) {
-            Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        File file = new File(FileUtils.getPath() + FILE_NAME);
+        file.setWritable(true);
+        file.setReadable(true);
         return file;
     }
 
-    public static boolean fileWriter(File file, String data) {
+    public static String getPath() {
+        String path = null;
+        try {
+            path = new File("").getCanonicalPath();
+        } catch (IOException ex) {
+            Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        System.out.println(data);
+        return path;
+    }
+
+    public static boolean fileWriter(File file, String data) {
         FileWriter writer;
         try {
             writer = new FileWriter(file);
@@ -63,7 +63,6 @@ public class FileUtils {
         if (file != null) {
             return file.delete();
         }
-
         return false;
     }
 
@@ -87,7 +86,7 @@ public class FileUtils {
         }
 
     }
-    
+
     public static Object deserialize(String fileName) {
         try {
             FileInputStream fis = new FileInputStream(fileName);

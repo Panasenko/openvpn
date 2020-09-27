@@ -221,16 +221,11 @@ public class VPN extends javax.swing.JFrame {
                 String ldap = dc.getLogin();
                 txtLdapLogin.setText(ldap);
                 connectData.setLogin(ldap);
-                
+
                 String pass = dc.getPassword();
                 txtPassword.setText(pass);
                 connectData.setPassword(pass);
-                
-                
-                System.out.println(path);
-                System.out.println(ldap);
-                System.out.println(pass);
-                
+
             } catch (IOException ex) {
                 Logger.getLogger(VPN.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -303,15 +298,18 @@ public class VPN extends javax.swing.JFrame {
 
                 String otp = JOptionPane.showInputDialog(this, "Введите ОТП-пароль");
 
-                if (otp.length() > 5 && otp != null) {
-                    connectVPN = new ConnectVPN(TMP_FILE_NAME, connectData, otp);
-                    connectVPN.start();
+                if (otp != null) {
+                    if (otp.length() > 5) {
+                        connectVPN = new ConnectVPN(TMP_FILE_NAME, connectData, otp);
+                        connectVPN.start();
+                        btnConnect.setText("Disconnect");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Ошибка! ОТП пароль не может быть меньше 6и символов!");
+                    }
 
                     if (checkBoxState) {
                         FileUtils.serializable(connectData, FileUtils.getCanonicalPath() + "/" + AUTH_FILE_NAME);
                     }
-
-                    btnConnect.setText("Disconnect");
 
                 }
 

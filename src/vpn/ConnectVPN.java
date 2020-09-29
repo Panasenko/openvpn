@@ -1,6 +1,5 @@
 package vpn;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -9,14 +8,14 @@ import java.util.logging.Logger;
 public class ConnectVPN extends Thread {
 
     private DataConnect dataConnect;
-    private Component comp;
-    private String otp;
+    private final String tmpFileName;
+    private final String otp;
     private Process process;
     private File tmpFile;
     private boolean statusConnect = false;
 
-    public ConnectVPN(Component comp, DataConnect dc, String otp) {
-        this.comp = comp;
+    public ConnectVPN(String tmpFileName, DataConnect dc, String otp) {
+        this.tmpFileName = tmpFileName;
         this.dataConnect = dc;
         this.otp = otp;
     }
@@ -40,7 +39,7 @@ public class ConnectVPN extends Thread {
     @Override
     public void run() {
         
-        tmpFile = FileUtils.genereteTempFile();
+        tmpFile = FileUtils.genereteTempFile(tmpFileName);
         
         if (FileUtils.fileWriter(tmpFile, (dataConnect.getLogin() + "\n" + dataConnect.getPassword() + otp))) {
 
@@ -53,6 +52,7 @@ public class ConnectVPN extends Thread {
                 FileUtils.deleteTempFile(tmpFile);
                 this.setStatusConnect(true);
                 process.waitFor();
+                System.out.println("Программу выбило");
                 this.setStatusConnect(false);
             } catch (IOException ex) {
                 System.out.println("Error in method connect " + ex);

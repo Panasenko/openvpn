@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -15,22 +16,20 @@ import javax.swing.filechooser.FileFilter;
 
 public class FileUtils {
 
-    private static String FILE_NAME = "/AUTH.txt";
-
     public static void addFileFilter(JFileChooser jfch, FileFilter ff) {
         jfch.removeChoosableFileFilter(jfch.getFileFilter());
         jfch.setFileFilter(ff);
         jfch.setSelectedFile(new File(""));
     }
 
-    public static File genereteTempFile() {
-        File file = new File(FileUtils.getPath() + FILE_NAME);
+    public static File genereteTempFile(String authFileName) {
+        File file = new File(FileUtils.getCanonicalPath() + "/" + authFileName);
         file.setWritable(true);
         file.setReadable(true);
         return file;
     }
 
-    public static String getPath() {
+    public static String getCanonicalPath() {
         String path = null;
         try {
             path = new File("").getCanonicalPath();
@@ -100,6 +99,16 @@ public class FileUtils {
         }
 
         return null;
+    }
+
+    public static File[] finder(String dirName, String fileName) {
+        File dir = new File(dirName);
+        return dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String filename) {
+                return filename.matches(fileName);
+            }
+        });
+
     }
 
 }

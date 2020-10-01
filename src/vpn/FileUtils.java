@@ -23,21 +23,18 @@ public class FileUtils {
     }
 
     public static File genereteTempFile(String authFileName) {
-        File file = new File(FileUtils.getCanonicalPath() + "/" + authFileName);
+        File file = new File(FileUtils.getPathToFile() + "/" + authFileName);
         file.setWritable(true);
         file.setReadable(true);
         return file;
     }
 
-    public static String getCanonicalPath() {
-        String path = null;
-        try {
-            path = new File("").getCanonicalPath();
-        } catch (IOException ex) {
-            Logger.getLogger(FileUtils.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public static String getPathToFile() {
 
-        return path;
+        File f = new File(System.getProperty("java.class.path"));
+        File dir = f.getAbsoluteFile().getParentFile();
+        return dir.toString();
+
     }
 
     public static boolean fileWriter(File file, String data) {

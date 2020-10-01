@@ -5,14 +5,18 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 public class VPN extends javax.swing.JFrame {
 
     private static final String CONF_FILE_EXTENSION = "conf";
-    private static final String TMP_FILE_NAME = "tmp_file.tvpn";
-    private static String AUTH_FILE_NAME = "auth_file.avpn";
+    private static final String TMP_FILE_NAME = "/tmp_file.tvpn";
+    private static String AUTH_FILE_NAME = "/auth_file.avpn";
     private static final String CONF_FILE_DESCRIPTION = "Файлы конфигураций";
 
     private static final String INPUT_LDAP_NAME = "Введите логин";
@@ -207,7 +211,7 @@ public class VPN extends javax.swing.JFrame {
 
     private void initStartAuthData() {
 
-        File[] file = FileUtils.finder(FileUtils.getCanonicalPath(), AUTH_FILE_NAME);
+        File[] file = FileUtils.finder(FileUtils.getPathToFile(), AUTH_FILE_NAME);
 
         if (file != null && file.length > 0) {
             try {
@@ -300,15 +304,14 @@ public class VPN extends javax.swing.JFrame {
 
                 if (otp != null) {
                     if (otp.length() > 5) {
-                        connectVPN = new ConnectVPN(TMP_FILE_NAME, connectData, otp);
+                        connectVPN = new ConnectVPN(TMP_FILE_NAME, connectData, otp, btnConnect);
                         connectVPN.start();
-                        btnConnect.setText("Disconnect");
                     } else {
                         JOptionPane.showMessageDialog(this, "Ошибка! ОТП пароль не может быть меньше 6и символов!");
                     }
 
                     if (checkBoxState) {
-                        FileUtils.serializable(connectData, FileUtils.getCanonicalPath() + "/" + AUTH_FILE_NAME);
+                        FileUtils.serializable(connectData, FileUtils.getPathToFile() + "/" + AUTH_FILE_NAME);
                     }
 
                 }
@@ -316,7 +319,7 @@ public class VPN extends javax.swing.JFrame {
             }
         } else {
             connectVPN.disconnect();
-            btnConnect.setText("Connect");
+            connectVPN = null;
         }
 
     }//GEN-LAST:event_btnConnectActionPerformed
@@ -330,29 +333,12 @@ public class VPN extends javax.swing.JFrame {
     }//GEN-LAST:event_chboxSaveDataItemStateChanged
 
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        JFrame.setDefaultLookAndFeelDecorated(true);
+
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VPN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VPN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VPN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(VPN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+        } catch (UnsupportedLookAndFeelException ex) {
         }
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

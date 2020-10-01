@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 
 public class ConnectVPN extends Thread {
 
@@ -12,20 +13,13 @@ public class ConnectVPN extends Thread {
     private final String otp;
     private Process process;
     private File tmpFile;
-    private boolean statusConnect = false;
+    private final JButton btnConnect;
 
-    public ConnectVPN(String tmpFileName, DataConnect dc, String otp) {
+    public ConnectVPN(String tmpFileName, DataConnect dc, String otp, JButton btnConnect) {
         this.tmpFileName = tmpFileName;
         this.dataConnect = dc;
         this.otp = otp;
-    }
-
-    public boolean getStatusConnect() {
-        return statusConnect;
-    }
-
-    public void setStatusConnect(boolean statusConnect) {
-        this.statusConnect = statusConnect;
+        this.btnConnect = btnConnect;
     }
 
     public DataConnect getDataConnect() {
@@ -38,9 +32,8 @@ public class ConnectVPN extends Thread {
 
     @Override
     public void run() {
-        
         tmpFile = FileUtils.genereteTempFile(tmpFileName);
-        
+
         if (FileUtils.fileWriter(tmpFile, (dataConnect.getLogin() + "\n" + dataConnect.getPassword() + otp))) {
 
             String[] cmd = new String[]{"/bin/bash", "-c", "openvpn --auth-user-pass " + tmpFile + " --config " + dataConnect.getPathConfFile()};
@@ -49,22 +42,22 @@ public class ConnectVPN extends Thread {
                 ProcessBuilder processBuilder = new ProcessBuilder(cmd);
                 process = processBuilder.start();
 
-                FileUtils.deleteTempFile(tmpFile);
-                this.setStatusConnect(true);
+//                FileUtils.deleteTempFile(tmpFile);
+                btnConnect.setText("Disconnect");
                 process.waitFor();
-                System.out.println("Программу выбило");
-                this.setStatusConnect(false);
+                btnConnect.setText("Connect");
+
             } catch (IOException ex) {
                 System.out.println("Error in method connect " + ex);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ConnectVPN.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
     }
 
     public boolean disconnect() {
         this.process.destroy();
-        return statusConnect = false;
+        btnConnect.setText("Connect");
+        return true;
     }
 }
